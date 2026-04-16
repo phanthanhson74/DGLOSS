@@ -5,7 +5,7 @@
     background-color: #fff;
     border-radius: 0.8rem;
     box-shadow: 0 0 1rem rgba(210, 210, 210, 0.6);
-    padding: 3.2rem 2.4rem;
+    padding: 2.9rem 2.4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -146,7 +146,7 @@
   &__form-options {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
+    gap: 1.9rem;
 
     &.is-error .p-front__form-option {
       border-color: #eb6101;

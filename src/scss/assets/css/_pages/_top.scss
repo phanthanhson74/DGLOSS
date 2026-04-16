@@ -45,7 +45,7 @@
     flex-direction: column;
     position: fixed;
     top: 50%;
-    right: 5.3rem;
+    right: 3.1rem;
     transform: translateY(-50%);
     z-index: 100;
     width: 34rem;
@@ -355,9 +355,9 @@
     #b6448b 57.15%,
     #399ac4 99.63%
   );
-  padding: 4rem 2rem;
+  padding: 4.4rem 2rem 4rem 2rem;
   &__ttl {
-    margin-bottom: 2.4rem;
+    margin-bottom: 2.7rem;
   }
 }
 
@@ -365,7 +365,7 @@
   position: relative;
   z-index: 2;
   background: #0a142d;
-  padding: 4rem 0;
+  padding: 4.1rem 0;
   &__list {
     padding: 2.4rem 2rem 0 2rem;
   }
@@ -379,7 +379,7 @@
 }
 .s-job {
   background: #0a142d;
-  padding: 6.8rem 2rem 4rem;
+  padding: 7.8rem 2rem 4rem;
   margin-top: -5rem;
 
   &__list {
@@ -413,7 +413,7 @@
     ul {
       li {
         & + li {
-          margin-top: 2rem;
+          margin-top: 1.7rem;
         }
       }
     }

@@ -1,6 +1,6 @@
 @charset "utf-8";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 /* clearfix (micro) */
 .clearfix:before,
@@ -125,15 +125,16 @@ html {
 }
 
 body {
-  font-family: "Noto Sans JP", "游ゴシック", "Yu Gothic", "游ゴシック体",
-    "YuGothic", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ",
-    "Meiryo", "ＭＳ Ｐゴシック", "MS PGothic", Arial, sans-serif;
+  font-family:
+    "Noto Sans JP", "游ゴシック", "Yu Gothic", "游ゴシック体", "YuGothic",
+    "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo",
+    "ＭＳ Ｐゴシック", "MS PGothic", Arial, sans-serif;
   font-style: normal;
   font-size: 16px;
   font-size: 1.6rem;
   line-height: 180%;
   color: $color_base;
-  background: #EC2C2C;
+  background: #31304d;
   //overflow-wrap: break-word;
   word-break: normal;
   line-break: strict;
@@ -351,4 +352,8 @@ li {
 
 .font-en {
   font-family: $font_en;
+}
+
+.no-scroll {
+  overflow: hidden;
 }

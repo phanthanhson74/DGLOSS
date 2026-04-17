@@ -38,6 +38,7 @@
     align-items: center;
     justify-content: center;
   }
+
   &__right {
     display: flex;
     align-items: center;
@@ -50,15 +51,18 @@
     z-index: 100;
     width: 34rem;
   }
+
   &__menu {
     background: #fff;
     padding: 4rem 2.8rem;
     min-width: 39.1rem;
     border-radius: 0.8rem;
     box-sizing: border-box;
+
     .menu-list {
       max-width: 26.9rem;
       margin: 0 auto;
+
       li {
         a {
           font-weight: 700;
@@ -68,11 +72,13 @@
           color: #31304d;
           display: block;
         }
-        & + li {
+
+        &+li {
           margin-top: 2.8rem;
         }
       }
     }
+
     .nav-btn {
       margin-top: 2.8rem;
       font-family: Noto Sans JP;
@@ -86,12 +92,14 @@
       border-radius: 50px;
       color: #fff;
       transition: 0.3s ease;
+
       &:hover {
         opacity: 0.7;
       }
     }
   }
 }
+
 .page-main {
   max-width: 37.5rem;
   order: 2;
@@ -108,8 +116,7 @@
     padding: 1.4rem 0;
   }
 
-  @include sp {
-  }
+  @include sp {}
 }
 
 .page-error {
@@ -117,28 +124,34 @@
   left: 0;
   width: 100%;
   box-shadow: none;
+
   .p-404 {
     padding: 8rem 0;
     text-align: center;
     color: #fff;
+
     @include sp {
       padding: 4rem 0;
     }
+
     h2 {
       font-size: 11rem;
       margin-bottom: 3rem;
       font-family: $font_en;
       line-height: 1.5;
+
       @include sp {
         font-size: 3rem;
         line-height: 1;
         margin-bottom: 1.5rem;
       }
     }
+
     .txt1 {
       font-size: 2.5rem;
       line-height: 1.5;
       margin-bottom: 4rem;
+
       @include sp {
         font-size: 1.5rem;
         line-height: 1.5;
@@ -147,6 +160,7 @@
       }
     }
   }
+
   .footer {
     width: 100%;
     position: fixed;
@@ -295,7 +309,7 @@
 
     .nav-menu {
       li {
-        & + li {
+        &+li {
           margin-top: 2.8rem;
         }
 
@@ -330,6 +344,7 @@
       border-radius: 50px;
       color: #fff;
       transition: 0.3s ease;
+
       &:hover {
         opacity: 0.7;
       }
@@ -339,6 +354,7 @@
 
 .main-visual {
   position: relative;
+
   img {
     width: 100%;
   }
@@ -347,15 +363,15 @@
 .hidden {
   opacity: 0 !important;
 }
+
 .s-entry {
-  background: linear-gradient(
-    89.67deg,
-    #ffb835 0.19%,
-    #cf6c6e 24.28%,
-    #b6448b 57.15%,
-    #399ac4 99.63%
-  );
+  background: linear-gradient(89.67deg,
+      #ffb835 0.19%,
+      #cf6c6e 24.28%,
+      #b6448b 57.15%,
+      #399ac4 99.63%);
   padding: 4.4rem 2rem 4rem 2rem;
+
   &__ttl {
     margin-bottom: 2.7rem;
   }
@@ -366,45 +382,54 @@
   z-index: 2;
   background: #0a142d;
   padding: 4.1rem 0;
+
   &__list {
     padding: 2.4rem 2rem 0 2rem;
   }
+
   img {
     width: 100%;
   }
 }
+
 .s-experience {
   background: #0a142d;
   padding: 4rem 2rem;
 }
+
 .s-job {
   background: #0a142d;
   padding: 7.8rem 2rem 4rem;
   margin-top: -5rem;
 
   &__list {
-    & + & {
+    &+& {
       margin-top: 3.6rem;
       padding-top: 3.6rem;
       border-top: 1px solid rgba(255, 255, 255, 0.32);
     }
   }
+
   & :last-child {
     img {
       padding: 0 5.85rem;
     }
   }
 }
+
 .s-thanks {
   padding: 8rem 2rem 0 2rem;
   background: #0c152e;
+
   img {
     width: 100%;
     display: block;
   }
+
   &__ttl {
     margin-bottom: 2.8rem;
   }
+
   &__list {
     padding: 2.8rem 2.4rem;
     background: #fff;
@@ -412,13 +437,15 @@
 
     ul {
       li {
-        & + li {
+        &+li {
           margin-top: 1.7rem;
         }
       }
     }
+
     .nav-btn {
       margin-top: 2rem;
+
       a {
         display: flex;
         align-items: center;
@@ -433,6 +460,7 @@
         border-radius: 5rem;
         min-height: 6rem;
         transition: 0.3s ease;
+
         &:hover {
           opacity: 0.7;
         }
@@ -440,6 +468,7 @@
     }
   }
 }
+
 .footer {
   background: #0a142d;
   position: relative;
@@ -449,6 +478,7 @@
   margin-top: 0 !important;
   background: #ffffff;
 }
+
 .txt-red {
   color: #ec2c2c;
 }
@@ -456,5 +486,11 @@
 @media screen and (min-width: 1280px) {
   .g-nav {
     left: calc((100% - 1280px) / 2 + 1000px);
+  }
+}
+
+html.no-scroll {
+  .page-main {
+    opacity: 0;
   }
 }

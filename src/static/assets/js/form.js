@@ -51,13 +51,42 @@
             }
         });
 
+        // åˆæœŸè¡¨ç¤º
+        updateView();
+
+        // å…¥åŠ›ãƒ»é¸æŠžæ™‚ã«ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+        setupErrorClearListeners();
+
+        // Enterã‚­ãƒ¼ã§ãƒ•ã‚©ãƒ¼ãƒ é€ä¿¡ã‚’é˜²æ­¢
+        form.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+            }
+        });
+
+
+
         function updateView() {
-            // show question
-            questions.forEach((q, index) => {
-                q.classList.toggle("is-active", index + 1 === currentStep);
+            // è³ªå•ã®è¡¨ç¤ºåˆ‡ã‚Šæ›¿ãˆ
+            questions.forEach(function (question, index) {
+                if (index + 1 === currentStep) {
+                    question.classList.add("is-active");
+                } else {
+                    question.classList.remove("is-active");
+                }
             });
 
-            // button state
+            // ã‚¹ãƒ†ãƒƒãƒ—ã‚¤ãƒ³ã‚¸ã‚±ãƒ¼ã‚¿ãƒ¼ã®æ›´æ–°
+            steps.forEach(function (step, index) {
+                step.classList.remove("is-active", "is-completed");
+                if (index + 1 === currentStep) {
+                    step.classList.add("is-active");
+                } else if (index + 1 < currentStep) {
+                    step.classList.add("is-completed");
+                }
+            });
+
+            // ãƒœã‚¿ãƒ³ã®è¡¨ç¤ºåˆ‡ã‚Šæ›¿ãˆ
             prevBtn.disabled = currentStep === 1;
 
             if (currentStep === totalSteps) {
@@ -67,162 +96,281 @@
                 nextBtn.style.display = "flex";
                 submitBtn.style.display = "none";
             }
-
-            // ✅ update step UI
-            steps.forEach((step, index) => {
-                step.classList.toggle("is-active", index < currentStep);
-            });
-
-            stepLines.forEach((line, index) => {
-                line.classList.toggle("is-active", index < currentStep - 1);
-            });
         }
 
         function validateCurrentStep() {
             const currentQuestion = form.querySelector(
-                `.p-front__form-question[data-step="${currentStep}"]`
+                '.p-front__form-question[data-step="' + currentStep + '"]',
             );
-
             if (!currentQuestion) return true;
 
             let isValid = true;
+
+            // æ—¢å­˜ã®ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
             clearErrors(currentQuestion);
 
-            // RADIO
+            // ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
             const radios = currentQuestion.querySelectorAll(".p-front__form-radio");
-            if (radios.length) {
-                const checked = currentQuestion.querySelector(".p-front__form-radio:checked");
+            if (radios.length > 0) {
+                const checked = currentQuestion.querySelector(
+                    ".p-front__form-radio:checked",
+                );
                 if (!checked) {
-                    showError(
-                        currentQuestion.querySelector(".p-front__form-options"),
-                        "選択してください"
+                    const optionsContainer = currentQuestion.querySelector(
+                        ".p-front__form-options",
                     );
+                    if (optionsContainer) {
+                        showError(optionsContainer, "é¸æŠžã—ã¦ãã ã•ã„");
+                    }
                     isValid = false;
                 }
             }
 
-            // INPUT
+            // å…¥åŠ›ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
             const inputs = currentQuestion.querySelectorAll(
-                'input[required]:not([type="radio"]):not([type="checkbox"])'
+                ".p-front__form-input[required]",
             );
-
-            inputs.forEach((input) => {
+            inputs.forEach(function (input) {
                 const value = input.value.trim();
+                const name = input.name;
 
+                // ç©ºãƒã‚§ãƒƒã‚¯
                 if (!value) {
-                    showError(input, "入力してください");
+                    showError(input, "å…¥åŠ›ã—ã¦ãã ã•ã„");
                     isValid = false;
                     return;
                 }
 
-                if (input.name === "tel" && !/^[0-9]{10,11}$/.test(value)) {
-                    showError(input, "正しい電話番号を入力してください");
-                    isValid = false;
+                // é›»è©±ç•ªå·ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
+                if (name === "tel") {
+                    if (!/^[0-9]{10,11}$/.test(value)) {
+                        if (value.includes("-")) {
+                            showError(input, "ãƒã‚¤ãƒ•ãƒ³ãªã—ã§å…¥åŠ›ã—ã¦ãã ã•ã„");
+                        } else {
+                            showError(input, "æ­£ã—ã„é›»è©±ç•ªå·ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
+                        }
+                        isValid = false;
+                        return;
+                    }
                 }
 
-                if (
-                    input.name === "email" &&
-                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-                ) {
-                    showError(input, "正しいメールアドレスを入力してください");
+                // ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
+                if (name === "email") {
+                    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+                        showError(input, "æ­£ã—ã„ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
+                        isValid = false;
+                        return;
+                    }
+                }
+
+                // å¹´é½¢ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
+                if (name === "age") {
+                    if (!/^[0-9]{2}$/.test(value)) {
+                        showError(input, "2æ¡ã®æ•°å­—ã§å…¥åŠ›ã—ã¦ãã ã•ã„");
+                        isValid = false;
+                        return;
+                    }
+                }
+            });
+
+            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
+            const selects = currentQuestion.querySelectorAll(
+                ".p-front__form-select[required]",
+            );
+            selects.forEach(function (select) {
+                if (!select.value) {
+                    showError(select, "é¸æŠžã—ã¦ãã ã•ã„");
                     isValid = false;
                 }
             });
 
-            // 生年月日
-            const year = currentQuestion.querySelector('select[name="birth_year"]');
-            const month = currentQuestion.querySelector('select[name="birth_month"]');
-            const day = currentQuestion.querySelector('select[name="birth_day"]');
-
-            if (year || month || day) {
-                if (!(year.value && month.value && day.value)) {
-                    showError(
-                        currentQuestion.querySelector(".p-front__form-birthday"),
-                        "生年月日を選択してください"
+            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
+            const checkboxes = currentQuestion.querySelectorAll(
+                ".p-front__form-checkbox[required]",
+            );
+            checkboxes.forEach(function (checkbox) {
+                if (!checkbox.checked) {
+                    const checkboxGroup = checkbox.closest(
+                        ".p-front__form-checkbox-group",
                     );
+                    if (checkboxGroup) {
+                        showError(checkboxGroup, "åŒæ„ãŒå¿…è¦ã§ã™");
+                    }
                     isValid = false;
+                }
+            });
+
+            // æœ€åˆã®ã‚¨ãƒ©ãƒ¼è¦ç´ ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹
+            if (!isValid) {
+                const firstError = currentQuestion.querySelector(".is-error");
+                if (firstError) {
+                    firstError.focus();
                 }
             }
-
-            // SELECT
-            const selects = currentQuestion.querySelectorAll(
-                'select[required]:not([name="birth_year"]):not([name="birth_month"]):not([name="birth_day"])'
-            );
-
-            selects.forEach((select) => {
-                if (!select.value) {
-                    showError(select, "選択してください");
-                    isValid = false;
-                }
-            });
-
-            // CHECKBOX
-            const checkboxes = currentQuestion.querySelectorAll(
-                'input[type="checkbox"][required]'
-            );
-
-            checkboxes.forEach((checkbox) => {
-                if (!checkbox.checked) {
-                    showError(
-                        checkbox.closest(".p-front__form-checkbox-group"),
-                        "同意が必要です"
-                    );
-                    isValid = false;
-                }
-            });
 
             return isValid;
         }
 
         function showError(element, message) {
-            if (!element) return;
-
             element.classList.add("is-error");
 
-            const oldError = element.parentNode.querySelector(".p-front__form-error");
-            if (oldError) oldError.remove();
+            // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¦ç´ ã‚’ä½œæˆ
+            const errorMsg = document.createElement("span");
+            errorMsg.className = "p-front__form-error";
+            errorMsg.textContent = message;
 
-            const error = document.createElement("span");
-            error.className = "p-front__form-error";
-            error.textContent = message;
+            // è¦ç´ ã®ç¨®é¡žã«å¿œã˜ã¦æŒ¿å…¥ä½ç½®ã‚’æ±ºå®š
+            if (element.classList.contains("p-front__form-options")) {
+                element.appendChild(errorMsg);
+            } else if (element.classList.contains("p-front__form-checkbox-group")) {
+                // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚°ãƒ«ãƒ¼ãƒ—ã®å ´åˆã¯è¦ªè¦ç´ ã«è¿½åŠ 
+                element.parentNode.appendChild(errorMsg);
+            } else {
+                // å¹´é½¢ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®å ´åˆã¯ p-front__form-age ã®å¾Œã«è¿½åŠ 
+                const ageContainer = element.closest(".p-front__form-age");
+                if (ageContainer) {
+                    ageContainer.parentNode.appendChild(errorMsg);
+                    return;
+                }
 
-            element.parentNode.appendChild(error);
+                // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯ p-front__form-select-wrap ã®å¾Œã«è¿½åŠ 
+                const selectWrap = element.closest(".p-front__form-select-wrap");
+                if (selectWrap) {
+                    selectWrap.parentNode.appendChild(errorMsg);
+                    return;
+                }
+
+                element.parentNode.appendChild(errorMsg);
+            }
         }
 
         function clearErrors(container) {
-            container.querySelectorAll(".is-error").forEach((el) => {
+            // ã‚¨ãƒ©ãƒ¼ã‚¯ãƒ©ã‚¹ã‚’å‰Šé™¤
+            const errorElements = container.querySelectorAll(".is-error");
+            errorElements.forEach(function (el) {
                 el.classList.remove("is-error");
             });
 
-            container.querySelectorAll(".p-front__form-error").forEach((el) => {
-                el.remove();
+            // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            const errorMessages = container.querySelectorAll(".p-front__form-error");
+            errorMessages.forEach(function (msg) {
+                msg.parentNode.removeChild(msg);
             });
         }
 
-        function setupErrorClearListeners() {
-            form.addEventListener("input", function (e) {
-                const target = e.target;
-                target.classList.remove("is-error");
+        function clearElementError(element) {
+            // è¦ç´ è‡ªèº«ã®ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+            element.classList.remove("is-error");
 
-                const error = target.parentNode.querySelector(".p-front__form-error");
-                if (error) error.remove();
+            // å¹´é½¢ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®å ´åˆã¯ p-front__form-input-group ã‹ã‚‰ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            const ageContainer = element.closest(".p-front__form-age");
+            if (ageContainer) {
+                const inputGroup = ageContainer.parentNode;
+                const errorMsg = inputGroup.querySelector(".p-front__form-error");
+                if (errorMsg) {
+                    inputGroup.removeChild(errorMsg);
+                }
+                return;
+            }
+
+            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯ p-front__form-input-group ã‹ã‚‰ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            const selectWrap = element.closest(".p-front__form-select-wrap");
+            if (selectWrap) {
+                const inputGroup = selectWrap.parentNode;
+                const errorMsg = inputGroup.querySelector(".p-front__form-error");
+                if (errorMsg) {
+                    inputGroup.removeChild(errorMsg);
+                }
+                return;
+            }
+
+            // è¦ªè¦ç´ å†…ã®ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            const parent = element.parentNode;
+            const errorMsg = parent.querySelector(".p-front__form-error");
+            if (errorMsg) {
+                parent.removeChild(errorMsg);
+            }
+        }
+
+        function clearContainerError(container, isCheckbox) {
+            container.classList.remove("is-error");
+
+            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯æ¬¡ã®å…„å¼Ÿè¦ç´ ï¼ˆã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ï¼‰ã‚’å‰Šé™¤
+            if (isCheckbox) {
+                const nextSibling = container.nextElementSibling;
+                if (
+                    nextSibling &&
+                    nextSibling.classList.contains("p-front__form-error")
+                ) {
+                    nextSibling.parentNode.removeChild(nextSibling);
+                }
+            } else {
+                const errorMsg = container.querySelector(".p-front__form-error");
+                if (errorMsg) {
+                    container.removeChild(errorMsg);
+                }
+            }
+        }
+
+        function setupErrorClearListeners() {
+            // ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³é¸æŠžæ™‚
+            const radios = form.querySelectorAll(".p-front__form-radio");
+            radios.forEach(function (radio) {
+                radio.addEventListener("change", function () {
+                    const optionsContainer = radio.closest(".p-front__form-options");
+                    if (optionsContainer) {
+                        clearContainerError(optionsContainer);
+                    }
+                });
             });
 
-            form.addEventListener("change", function () {
-                clearErrors(
-                    form.querySelector(
-                        `.p-front__form-question[data-step="${currentStep}"]`
-                    )
-                );
+            // å…¥åŠ›ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰å…¥åŠ›æ™‚
+            const inputs = form.querySelectorAll(".p-front__form-input");
+            inputs.forEach(function (input) {
+                input.addEventListener("input", function () {
+                    clearElementError(input);
+                });
+            });
+
+            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹é¸æŠžæ™‚
+            const selects = form.querySelectorAll(".p-front__form-select");
+            selects.forEach(function (select) {
+                select.addEventListener("change", function () {
+                    clearElementError(select);
+                });
+            });
+
+            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹é¸æŠžæ™‚
+            const checkboxes = form.querySelectorAll(".p-front__form-checkbox");
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener("change", function () {
+                    const checkboxGroup = checkbox.closest(
+                        ".p-front__form-checkbox-group",
+                    );
+                    if (checkboxGroup) {
+                        clearContainerError(checkboxGroup, true);
+                    }
+                });
             });
         }
 
         function submitForm() {
+            // é€ä¿¡ä¸­ã®çŠ¶æ…‹ã«ã™ã‚‹
             submitBtn.disabled = true;
             submitBtn.querySelector(".p-front__form-btn-text").textContent =
                 "送信中...";
 
-            form.submit();
+            // reCAPTCHA v3 ãƒˆãƒ¼ã‚¯ãƒ³ã‚’å–å¾—ã—ã¦ã‹ã‚‰ãƒ•ã‚©ãƒ¼ãƒ ã‚’é€ä¿¡
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute("6LfdaoAsAAAAACdO7rTXoO_JWwnCFrlOxQwzSuoT", {
+                        action: "submit",
+                    })
+                    .then(function (token) {
+                        document.getElementById("recaptcha_response").value = token;
+                        form.submit();
+                    });
+            });
         }
     }
 })();

@@ -23,13 +23,18 @@
         let currentStep = 1;
         const totalSteps = questions.length;
 
+        // 初期表示
         updateView();
+
+        // 入力・選択時にエラーをクリア
         setupErrorClearListeners();
 
+        // Enterキーでフォーム送信を防止
         form.addEventListener("keydown", function (e) {
             if (e.key === "Enter") e.preventDefault();
         });
 
+        // 戻るボタン
         prevBtn.addEventListener("click", function () {
             if (currentStep > 1) {
                 currentStep--;
@@ -37,6 +42,7 @@
             }
         });
 
+        // 進むボタン
         nextBtn.addEventListener("click", function () {
             if (validateCurrentStep() && currentStep < totalSteps) {
                 currentStep++;
@@ -44,6 +50,7 @@
             }
         });
 
+        // 送信ボタン
         submitBtn.addEventListener("click", function (e) {
             e.preventDefault();
             if (validateCurrentStep()) {
@@ -51,13 +58,7 @@
             }
         });
 
-        // åˆæœŸè¡¨ç¤º
-        updateView();
-
-        // å…¥åŠ›ãƒ»é¸æŠžæ™‚ã«ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
-        setupErrorClearListeners();
-
-        // Enterã‚­ãƒ¼ã§ãƒ•ã‚©ãƒ¼ãƒ é€ä¿¡ã‚’é˜²æ­¢
+        // Enterキーでフォーム送信を防止
         form.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -67,7 +68,7 @@
 
 
         function updateView() {
-            // è³ªå•ã®è¡¨ç¤ºåˆ‡ã‚Šæ›¿ãˆ
+            // 質問の表示切り替え
             questions.forEach(function (question, index) {
                 if (index + 1 === currentStep) {
                     question.classList.add("is-active");
@@ -76,7 +77,6 @@
                 }
             });
 
-            // ã‚¹ãƒ†ãƒƒãƒ—ã‚¤ãƒ³ã‚¸ã‚±ãƒ¼ã‚¿ãƒ¼ã®æ›´æ–°
             steps.forEach(function (step, index) {
                 step.classList.remove("is-active", "is-completed");
                 if (index + 1 === currentStep) {
@@ -86,7 +86,7 @@
                 }
             });
 
-            // ãƒœã‚¿ãƒ³ã®è¡¨ç¤ºåˆ‡ã‚Šæ›¿ãˆ
+            // ボタンの表示切り替え
             prevBtn.disabled = currentStep === 1;
 
             if (currentStep === totalSteps) {
@@ -106,10 +106,10 @@
 
             let isValid = true;
 
-            // æ—¢å­˜ã®ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+            // 既存のエラーをクリア
             clearErrors(currentQuestion);
 
-            // ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
+            // ラジオボタンのバリデーション
             const radios = currentQuestion.querySelectorAll(".p-front__form-radio");
             if (radios.length > 0) {
                 const checked = currentQuestion.querySelector(
@@ -120,71 +120,82 @@
                         ".p-front__form-options",
                     );
                     if (optionsContainer) {
-                        showError(optionsContainer, "é¸æŠžã—ã¦ãã ã•ã„");
+                        showError(optionsContainer, "選択してください");
                     }
                     isValid = false;
                 }
             }
 
-            // å…¥åŠ›ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
+            // 入力フィールドのバリデーション
             const inputs = currentQuestion.querySelectorAll(
-                ".p-front__form-input[required]",
+                ".js-form-input[required]",
             );
             inputs.forEach(function (input) {
                 const value = input.value.trim();
                 const name = input.name;
 
-                // ç©ºãƒã‚§ãƒƒã‚¯
+                // 空チェック
                 if (!value) {
-                    showError(input, "å…¥åŠ›ã—ã¦ãã ã•ã„");
+                    showError(input, "入力してください");
                     isValid = false;
                     return;
                 }
 
-                // é›»è©±ç•ªå·ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
+                // 電話番号の形式チェック
                 if (name === "tel") {
                     if (!/^[0-9]{10,11}$/.test(value)) {
                         if (value.includes("-")) {
-                            showError(input, "ãƒã‚¤ãƒ•ãƒ³ãªã—ã§å…¥åŠ›ã—ã¦ãã ã•ã„");
+                            showError(input, "ハイフンなしで入力してください");
                         } else {
-                            showError(input, "æ­£ã—ã„é›»è©±ç•ªå·ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
+                            showError(input, "正しい電話番号を入力してください");
                         }
                         isValid = false;
                         return;
                     }
                 }
 
-                // ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
-                if (name === "email") {
-                    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
-                        showError(input, "æ­£ã—ã„ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
-                        isValid = false;
-                        return;
-                    }
-                }
-
-                // å¹´é½¢ã®å½¢å¼ãƒã‚§ãƒƒã‚¯
                 if (name === "age") {
                     if (!/^[0-9]{2}$/.test(value)) {
-                        showError(input, "2æ¡ã®æ•°å­—ã§å…¥åŠ›ã—ã¦ãã ã•ã„");
+                        showError(input, "生年月日を選択してください");
                         isValid = false;
                         return;
                     }
                 }
             });
 
-            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
-            const selects = currentQuestion.querySelectorAll(
-                ".p-front__form-select[required]",
-            );
-            selects.forEach(function (select) {
-                if (!select.value) {
-                    showError(select, "é¸æŠžã—ã¦ãã ã•ã„");
-                    isValid = false;
-                }
-            });
+			// メールアドレス（任意）の形式チェック
+			const emailInput = currentQuestion.querySelector('.js-form-input[name="email"]');
+			if (emailInput) {
+				const emailValue = emailInput.value.trim();
+				if (emailValue && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailValue)) {
+				showError(emailInput, "正しいメールアドレスを入力してください");
+				isValid = false;
+				}
+			}
 
-            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®ãƒãƒªãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
+			// 生年月日のバリデーション（年/月/日をグループとして扱う）
+			const birthdayContainer = currentQuestion.querySelector(".js-form-birthday");
+			if (birthdayContainer) {
+				const birthdaySelects = birthdayContainer.querySelectorAll(".js-form-select[required]");
+				const allFilled = Array.from(birthdaySelects).every(function (s) { return s.value; });
+				if (!allFilled) {
+				showError(birthdayContainer, "生年月日を選択してください");
+				isValid = false;
+				}
+			}
+
+			// その他のセレクトボックスのバリデーション
+			const selects = currentQuestion.querySelectorAll(
+				".js-form-select[required]:not(.p-front__form-select--birthday)"
+			);
+			selects.forEach(function (select) {
+				if (!select.value) {
+				showError(select, "選択してください");
+				isValid = false;
+				}
+			});
+
+            // チェックボックスのバリデーション
             const checkboxes = currentQuestion.querySelectorAll(
                 ".p-front__form-checkbox[required]",
             );
@@ -194,13 +205,13 @@
                         ".p-front__form-checkbox-group",
                     );
                     if (checkboxGroup) {
-                        showError(checkboxGroup, "åŒæ„ãŒå¿…è¦ã§ã™");
+                        showError(checkboxGroup, "同意が必要です");
                     }
                     isValid = false;
                 }
             });
 
-            // æœ€åˆã®ã‚¨ãƒ©ãƒ¼è¦ç´ ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹
+            // 最初のエラー要素にフォーカス
             if (!isValid) {
                 const firstError = currentQuestion.querySelector(".is-error");
                 if (firstError) {
@@ -214,26 +225,25 @@
         function showError(element, message) {
             element.classList.add("is-error");
 
-            // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¦ç´ ã‚’ä½œæˆ
+            // エラーメッセージ要素を作成
             const errorMsg = document.createElement("span");
             errorMsg.className = "p-front__form-error";
             errorMsg.textContent = message;
 
-            // è¦ç´ ã®ç¨®é¡žã«å¿œã˜ã¦æŒ¿å…¥ä½ç½®ã‚’æ±ºå®š
+            // 要素の種類に応じて挿入位置を決定
             if (element.classList.contains("p-front__form-options")) {
                 element.appendChild(errorMsg);
             } else if (element.classList.contains("p-front__form-checkbox-group")) {
-                // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚°ãƒ«ãƒ¼ãƒ—ã®å ´åˆã¯è¦ªè¦ç´ ã«è¿½åŠ 
+                // チェックボックスグループの場合は親要素に追加
                 element.parentNode.appendChild(errorMsg);
             } else {
-                // å¹´é½¢ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®å ´åˆã¯ p-front__form-age ã®å¾Œã«è¿½åŠ 
                 const ageContainer = element.closest(".p-front__form-age");
                 if (ageContainer) {
                     ageContainer.parentNode.appendChild(errorMsg);
                     return;
                 }
 
-                // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯ p-front__form-select-wrap ã®å¾Œã«è¿½åŠ 
+                // セレクトボックスの場合は p-front__form-select-wrap の後に追加
                 const selectWrap = element.closest(".p-front__form-select-wrap");
                 if (selectWrap) {
                     selectWrap.parentNode.appendChild(errorMsg);
@@ -245,13 +255,13 @@
         }
 
         function clearErrors(container) {
-            // ã‚¨ãƒ©ãƒ¼ã‚¯ãƒ©ã‚¹ã‚’å‰Šé™¤
+            // エラークラスを削除
             const errorElements = container.querySelectorAll(".is-error");
             errorElements.forEach(function (el) {
                 el.classList.remove("is-error");
             });
 
-            // ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            // エラーメッセージを削除
             const errorMessages = container.querySelectorAll(".p-front__form-error");
             errorMessages.forEach(function (msg) {
                 msg.parentNode.removeChild(msg);
@@ -259,10 +269,9 @@
         }
 
         function clearElementError(element) {
-            // è¦ç´ è‡ªèº«ã®ã‚¨ãƒ©ãƒ¼ã‚’ã‚¯ãƒªã‚¢
+            // 要素自身のエラーをクリア
             element.classList.remove("is-error");
 
-            // å¹´é½¢ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®å ´åˆã¯ p-front__form-input-group ã‹ã‚‰ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
             const ageContainer = element.closest(".p-front__form-age");
             if (ageContainer) {
                 const inputGroup = ageContainer.parentNode;
@@ -273,7 +282,7 @@
                 return;
             }
 
-            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯ p-front__form-input-group ã‹ã‚‰ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            // セレクトボックスの場合は js-form-wrap からエラーメッセージを削除
             const selectWrap = element.closest(".p-front__form-select-wrap");
             if (selectWrap) {
                 const inputGroup = selectWrap.parentNode;
@@ -284,7 +293,7 @@
                 return;
             }
 
-            // è¦ªè¦ç´ å†…ã®ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‰Šé™¤
+            // 親要素内のエラーメッセージを削除
             const parent = element.parentNode;
             const errorMsg = parent.querySelector(".p-front__form-error");
             if (errorMsg) {
@@ -295,7 +304,7 @@
         function clearContainerError(container, isCheckbox) {
             container.classList.remove("is-error");
 
-            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®å ´åˆã¯æ¬¡ã®å…„å¼Ÿè¦ç´ ï¼ˆã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ï¼‰ã‚’å‰Šé™¤
+            // チェックボックスの場合は次の兄弟要素（エラーメッセージ）を削除
             if (isCheckbox) {
                 const nextSibling = container.nextElementSibling;
                 if (
@@ -313,7 +322,7 @@
         }
 
         function setupErrorClearListeners() {
-            // ãƒ©ã‚¸ã‚ªãƒœã‚¿ãƒ³é¸æŠžæ™‚
+            // ラジオボタン選択時
             const radios = form.querySelectorAll(".p-front__form-radio");
             radios.forEach(function (radio) {
                 radio.addEventListener("change", function () {
@@ -324,7 +333,7 @@
                 });
             });
 
-            // å…¥åŠ›ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰å…¥åŠ›æ™‚
+            // 入力フィールド入力時
             const inputs = form.querySelectorAll(".p-front__form-input");
             inputs.forEach(function (input) {
                 input.addEventListener("input", function () {
@@ -332,7 +341,7 @@
                 });
             });
 
-            // ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹é¸æŠžæ™‚
+            // セレクトボックス選択時
             const selects = form.querySelectorAll(".p-front__form-select");
             selects.forEach(function (select) {
                 select.addEventListener("change", function () {
@@ -340,7 +349,7 @@
                 });
             });
 
-            // ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹é¸æŠžæ™‚
+            // チェックボックス選択時
             const checkboxes = form.querySelectorAll(".p-front__form-checkbox");
             checkboxes.forEach(function (checkbox) {
                 checkbox.addEventListener("change", function () {
@@ -355,12 +364,12 @@
         }
 
         function submitForm() {
-            // é€ä¿¡ä¸­ã®çŠ¶æ…‹ã«ã™ã‚‹
+            // 送信中の状態にする
             submitBtn.disabled = true;
             submitBtn.querySelector(".p-front__form-btn-text").textContent =
                 "送信中...";
 
-            // reCAPTCHA v3 ãƒˆãƒ¼ã‚¯ãƒ³ã‚’å–å¾—ã—ã¦ã‹ã‚‰ãƒ•ã‚©ãƒ¼ãƒ ã‚’é€ä¿¡
+            // reCAPTCHA v3トークンを取得してフォームを送信
             grecaptcha.ready(function () {
                 grecaptcha
                     .execute("6LfdaoAsAAAAACdO7rTXoO_JWwnCFrlOxQwzSuoT", {

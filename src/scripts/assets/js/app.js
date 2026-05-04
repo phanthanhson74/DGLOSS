@@ -122,4 +122,32 @@ const initHeader = () => {
   handleHeaderState();
 };
 
+const smoothScrollFromQuery = {
+  location: location.pathname,
+
+  init: function () {
+    // Skip if in admin panel
+    if (this.location.includes("/admin/")) return;
+
+    const params = new URLSearchParams(location.search);
+    const anchor = params.get("anc") || params.keys().next().value;
+    const selector = anchor ? `#${anchor}` : null;
+    const target = selector ? document.querySelector(selector) : null;
+
+    if (target) {
+      // Delay to ensure DOM is fully ready
+      setTimeout(() => {
+        scrollToTarget(target);
+      }, 700); // Matches jQuery animate delay
+    }
+  }
+};
+
+// Run query-based scroll on page load if URL has query string
+if (location.search) {
+  setTimeout(() => {
+    smoothScrollFromQuery.init();
+  }, 100);
+}
+
 initHeader();

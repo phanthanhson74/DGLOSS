@@ -108,147 +108,164 @@
 
       let isValid = true;
 
-      // エラー初期化
       clearErrors(currentQuestion);
 
-      // ラジオボタン
-      const radios = currentQuestion.querySelectorAll(".p-front__form-radio");
+      const getValue = (name) => {
+        const el = currentQuestion.querySelector(`[name="${name}"]`);
+        return el ? el.value.trim() : "";
+      };
 
+      const getInput = (name) => {
+        return currentQuestion.querySelector(`[name="${name}"]`);
+      };
+
+      // ========================
+      // RULE DEFINITIONS
+      // ========================
+      const rules = {
+        name: {
+          required: true,
+          message: "氏名を入力してください。",
+        },
+
+        email: {
+          required: true,
+          pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+          requiredMsg: "メールアドレスを入力してください。",
+          invalidMsg: "メールアドレスの形式が正しくありません。",
+        },
+
+        email_confirm: {
+          required: true,
+          match: "email",
+          requiredMsg: "メールアドレスを入力してください。",
+          mismatchMsg: "メールアドレスが一致しません。もう一度ご確認ください。",
+        },
+
+        tel: {
+          required: true,
+          validate: (value) => {
+            const normalized = value.replace(/-/g, "");
+            return /^[0-9]{10,11}$/.test(normalized);
+          },
+          requiredMsg: "電話番号を入力してください。",
+          invalidMsg: "有効な電話番号を入力してください。",
+        },
+      };
+
+      // ========================
+      // TEXT INPUT VALIDATION
+      // ========================
+      Object.keys(rules).forEach((name) => {
+        const input = getInput(name);
+        if (!input) return;
+
+        const value = getValue(name);
+        const rule = rules[name];
+
+        // required
+        if (rule.required && !value) {
+          showError(input, rule.requiredMsg || rule.message);
+          isValid = false;
+          return;
+        }
+
+        // pattern (email)
+        if (rule.pattern && value && !rule.pattern.test(value)) {
+          showError(input, rule.invalidMsg);
+          isValid = false;
+          return;
+        }
+
+        // custom validate (tel)
+        if (rule.validate && value && !rule.validate(value)) {
+          showError(input, rule.invalidMsg);
+          isValid = false;
+          return;
+        }
+
+        // match (email confirm)
+        if (rule.match && value) {
+          const targetValue = getValue(rule.match);
+          if (value !== targetValue) {
+            showError(input, rule.mismatchMsg);
+            isValid = false;
+            return;
+          }
+        }
+      });
+
+      // ========================
+      // RADIO
+      // ========================
+      const radios = currentQuestion.querySelectorAll(".p-front__form-radio");
       if (radios.length > 0) {
         const checked = currentQuestion.querySelector(
           ".p-front__form-radio:checked",
         );
 
         if (!checked) {
-          const optionsContainer = currentQuestion.querySelector(
+          const container = currentQuestion.querySelector(
             ".p-front__form-options",
           );
-
-          if (optionsContainer) {
-            showError(optionsContainer, "選択してください");
-          }
-
+          if (container) showError(container, "選択してください");
           isValid = false;
         }
       }
 
-      // 入力フィールド
-      const inputs = currentQuestion.querySelectorAll(
-        ".js-form-input[required]",
-      );
-
-      inputs.forEach(function (input) {
-        const value = input.value.trim();
-        const name = input.name;
-
-        // 空チェック
-        if (!value) {
-          if (name === "name") {
-            showError(input, "氏名を入力してください");
-          } else if (name === "email") {
-            showError(input, "メールアドレスを入力してください");
-          } else {
-            showError(input, "入力してください");
-          }
-
-          isValid = false;
-          return;
-        }
-
-        // 電話番号
-        if (name === "tel") {
-          // ハイフンあり
-          if (value.includes("-")) {
-            showError(input, "ハイフンなしで入力してください");
-            isValid = false;
-            return;
-          }
-
-          // 数字以外 or 桁数不正
-          if (!/^[0-9]{10,11}$/.test(value)) {
-            showError(input, "有効な電話番号を入力してください");
-            isValid = false;
-            return;
-          }
-        }
-      });
-
-      // メール
-      const emailInput = currentQuestion.querySelector(
-        '.js-form-input[name="email"]',
-      );
-
-      if (emailInput) {
-        const emailValue = emailInput.value.trim();
-
-        // 必須
-        if (!emailValue) {
-          showError(emailInput, "メールアドレスを入力してください");
-          isValid = false;
-        }
-        // 形式不正
-        else if (
-          !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailValue)
-        ) {
-          showError(emailInput, "メールアドレス形式をもう一度ご確認ください");
-          isValid = false;
-        }
-      }
-
-      // 生年月日
-      const birthdayContainer =
-        currentQuestion.querySelector(".js-form-birthday");
-
-      if (birthdayContainer) {
-        const birthdaySelects = birthdayContainer.querySelectorAll(
-          ".js-form-select[required]",
-        );
-
-        const allFilled = Array.from(birthdaySelects).every(function (select) {
-          return select.value;
-        });
-
-        if (!allFilled) {
-          showError(birthdayContainer, "生年月日を選択してください");
-          isValid = false;
-        }
-      }
-
-      // その他セレクト
+      // ========================
+      // SELECT
+      // ========================
       const selects = currentQuestion.querySelectorAll(
         ".js-form-select[required]:not(.p-front__form-select--birthday)",
       );
 
-      selects.forEach(function (select) {
+      selects.forEach((select) => {
         if (!select.value) {
           showError(select, "選択してください");
           isValid = false;
         }
       });
 
-      // チェックボックス
+      // ========================
+      // BIRTHDAY
+      // ========================
+      const birthdayContainer =
+        currentQuestion.querySelector(".js-form-birthday");
+
+      if (birthdayContainer) {
+        const selects = birthdayContainer.querySelectorAll(
+          ".js-form-select[required]",
+        );
+
+        const allFilled = Array.from(selects).every((s) => s.value);
+
+        if (!allFilled) {
+          showError(birthdayContainer, "生年月日を選択してください。");
+          isValid = false;
+        }
+      }
+
+      // ========================
+      // CHECKBOX
+      // ========================
       const checkboxes = currentQuestion.querySelectorAll(
         ".p-front__form-checkbox[required]",
       );
 
-      checkboxes.forEach(function (checkbox) {
+      checkboxes.forEach((checkbox) => {
         if (!checkbox.checked) {
-          const checkboxGroup = checkbox.closest(
-            ".p-front__form-checkbox-group",
-          );
-
-          if (checkboxGroup) {
-            showError(checkboxGroup, "同意が必要です");
-          }
-
+          const group = checkbox.closest(".p-front__form-checkbox-group");
+          if (group) showError(group, "同意が必要です");
           isValid = false;
         }
       });
 
-      // 最初のエラーへフォーカス
+      // ========================
+      // FOCUS ERROR
+      // ========================
       if (!isValid) {
         const firstError = currentQuestion.querySelector(".is-error");
-
         if (firstError && typeof firstError.focus === "function") {
           firstError.focus();
         }

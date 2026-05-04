@@ -6,7 +6,7 @@
 
 $(function () {
   var smoothScroll = function () {
-    var $header = $(".page-header");
+    var $header = $(".l-header");
     var headerHeight = $header.innerHeight();
     var speed = 500;
 
@@ -26,7 +26,7 @@ $(function () {
         if ($hash.length) {
           $("html, body").animate(
             {
-              scrollTop: $hash.offset().top,
+              scrollTop: $hash.offset().top - headerHeight,
             },
             speed,
             "swing",
@@ -54,7 +54,7 @@ $(function () {
           if ($target.length) {
             $("html, body").animate(
               {
-                scrollTop: $target.offset().top,
+                scrollTop: $target.offset().top - headerHeight,
               },
               speed,
               "swing",
@@ -140,7 +140,7 @@ const smoothScrollFromQuery = {
         scrollToTarget(target);
       }, 700); // Matches jQuery animate delay
     }
-  }
+  },
 };
 
 // Run query-based scroll on page load if URL has query string

@@ -146,7 +146,7 @@
   &__form-options {
     display: flex;
     flex-direction: column;
-    gap: 1.9rem;
+    gap: 1.6rem;
 
     &.is-error .p-front__form-option {
       border-color: #eb6101;
@@ -207,6 +207,7 @@
         padding: 1.3rem 1.9rem;
         outline: none;
         transition: border-color 0.2s;
+        margin-top: 0.3rem;
         &:focus {
           border-color: #eb6101;
         }
@@ -368,6 +369,7 @@
   &__form-checkbox-group {
     display: flex;
     justify-content: flex-start;
+    margin-top: -1.3rem;
 
     &.is-error .p-front__form-checkbox-icon {
       border-color: #eb6101;
@@ -377,7 +379,7 @@
   &__form-checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 1rem;
     cursor: pointer;
   }
 
